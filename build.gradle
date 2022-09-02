@@ -1,0 +1,27 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group 'it.books'
+version '1.0'
+
+repositories {
+    mavenCentral()
+}
+
+jar{
+    duplicatesStrategy = duplicatesStrategy.EXCLUDE
+    manifest {
+        attributes("Main-Class":"it.books.Main", "Manifest-Version":"1.0")
+    }
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+dependencies {
+    // https://mvnrepository.com/artifact/net.sf.ucanaccess/ucanaccess
+    implementation 'net.sf.ucanaccess:ucanaccess:5.0.1'
+
+}

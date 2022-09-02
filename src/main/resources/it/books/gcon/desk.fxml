@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.input.KeyCodeCombination?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane fx:id="MainPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.books.gcon.DeskG">
+   <top>
+      <MenuBar BorderPane.alignment="CENTER">
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+               <items>
+                  <MenuItem fx:id="OpenButton" mnemonicParsing="false" onAction="#OpenBtn" text="Apri database...">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="O" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator>
+                  </MenuItem>
+                  <MenuItem fx:id="CloseViewButton" mnemonicParsing="false" onAction="#CloseViewBtn" text="Chiudi database" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem mnemonicParsing="false" onAction="#CreateNewBtn" text="Crea database" />
+                  <MenuItem mnemonicParsing="false" onAction="#CloseBtn" text="Esci">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="Q" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator>
+                  </MenuItem>
+               </items>
+          </Menu>
+            <Menu mnemonicParsing="false" text="Altro">
+               <items>
+                  <MenuItem fx:id="AboutButton" mnemonicParsing="false" onAction="#AboutBtn" text="Informazioni..." />
+               </items>
+            </Menu>
+        </menus>
+      </MenuBar>
+   </top>
+   <bottom>
+      <VBox alignment="TOP_CENTER" prefHeight="24.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+         <children>
+            <Separator opacity="0.75" prefWidth="200.0" />
+            <Label text="Software di catalogazione dei libri - V1.0 - Settembre 2022">
+               <font>
+                  <Font size="10.0" />
+               </font>
+            </Label>
+         </children>
+      </VBox>
+   </bottom>
+</BorderPane>
