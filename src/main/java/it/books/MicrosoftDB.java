@@ -62,4 +62,37 @@ public class MicrosoftDB {
         }
     }
 
+    /** Connect and retrieve the entire list of books from a given database
+     * @param dbFile specify the database file to work on
+     * @return the list of specified book
+     * **/
+    public static ArrayList<Book> connectAndGet(File dbFile){
+        // Supply bug
+        String db = dbFile.getAbsolutePath().replace("\\", "/");
+        try(Connection conn= DriverManager.getConnection("jdbc:ucanaccess://"+db+";memory=true")){
+            //Connect and get raw results
+            Statement query = conn.createStatement();
+            ResultSet res = query.executeQuery("SELECT * FROM LIBRI");
+            ArrayList<Book> bookList = new ArrayList<>();
+            //Book setup
+            while(res.next()){
+                Book book = new Book(res.getString("codice"), res.getString("titolo"));
+                book.setDetails(res.getString("autore"), res.getBoolean("unico_autore"), res.getString("collana"), res.getString("genere"), res.getString("editore"), res.getString("edizione"), res.getString("anno"));
+                book.setDetails(res.getString("scaffale"), (res.getString("pro_dal_gg") +"/" + (res.getString("pro_dal_mm") + "/" + res.getString("pro_dal_aa"))), res.getString("commento"));
+                book.setLocale(res.getString("nazione"), res.getString("traduttore"), res.getString("titolo_orig"));
+                book.setPages(res.getInt("pagine"), res.getString("formato"));
+                if(res.getBoolean("prestito")){
+                    book.setLeasing(true, (res.getString("pre_dal_gg") + "/" + res.getString("pre_dal_mm") + "/" + res.getString("pre_dal_aa")), res.getString("prestitario"));
+                }else{
+                    book.setLeasing(false, "", "");
+                }
+                bookList.add(book);
+            }
+            return bookList;
+
+        }catch (SQLException e){
+            return null;
+        }
+
+    }
 }

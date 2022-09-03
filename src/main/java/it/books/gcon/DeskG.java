@@ -69,6 +69,11 @@ public class DeskG {
     }
 
     @FXML
+    ToggleGroup view;
+    @FXML
+    RadioMenuItem RadioMenuTLoadButton, RadioMenuILoadButton;
+
+    @FXML
     private void OpenBtn(){
         //Selecting files
         FileChooser dChooser = new FileChooser();
@@ -80,9 +85,23 @@ public class DeskG {
             msg.show();
         }else{
             //Loading and operating with database files
-            ArrayList<Book> book = MicrosoftDB.connectAndGet(dbFile, off, limit);
-            //Update offset
-            off += limit;
+            ArrayList<Book> book;
+
+            if(view.getToggles().get(0).isSelected()){ //Incremental load
+                RadioMenuILoadButton.setDisable(true);
+                RadioMenuTLoadButton.setDisable(true);
+
+                book = MicrosoftDB.connectAndGet(dbFile, off, limit);
+                //Update offset
+                off += limit;
+            }
+            else{ //Full load
+                RadioMenuILoadButton.setDisable(true);
+                RadioMenuTLoadButton.setDisable(true);
+
+                book = MicrosoftDB.connectAndGet(dbFile);
+
+            }
 
             if(book == null){
                 Alert msg = new Alert(Alert.AlertType.ERROR, "Errore del file. Non \u00E8 stata trovata una tabella valida nel file selezionato.", ButtonType.OK);
@@ -107,30 +126,32 @@ public class DeskG {
                 CloseViewButton.setDisable(false);
                 OpenButton.setDisable(true);
 
-                //Define scrollbar action delayed.
-                Task<Void> scrollAction = new Task<>() {
-                    @Override
-                    @SuppressWarnings("unchecked")
-                    protected Void call() throws Exception {
-                        Thread.sleep(2000);
-                        ScrollBar scroll = (ScrollBar) MainPane.getCenter().lookup(".scroll-bar:vertical");
-                        scroll.valueProperty().addListener((obsV, oldV, newV) -> {
-                            if((double) newV == 1.0){ //Reaches the bottom
-                                if(!finished){
-                                    List<Book> otherBooks = MicrosoftDB.connectAndGet(dbFile, off, limit);
-                                    finished = otherBooks == null;
+                //Define scrollbar action delayed on incremental load
+                if(view.getToggles().get(0).isSelected()){
+                    Task<Void> scrollAction = new Task<>() {
+                        @Override
+                        @SuppressWarnings("unchecked")
+                        protected Void call() throws Exception {
+                            Thread.sleep(2000);
+                            ScrollBar scroll = (ScrollBar) MainPane.getCenter().lookup(".scroll-bar:vertical");
+                            scroll.valueProperty().addListener((obsV, oldV, newV) -> {
+                                if((double) newV == 1.0){ //Reaches the bottom
                                     if(!finished){
-                                        off+=limit;
-                                        ((TableView<Book>) MainPane.getCenter()).getItems().addAll(otherBooks);
+                                        List<Book> otherBooks = MicrosoftDB.connectAndGet(dbFile, off, limit);
+                                        finished = otherBooks == null;
+                                        if(!finished){
+                                            off+=limit;
+                                            ((TableView<Book>) MainPane.getCenter()).getItems().addAll(otherBooks);
+                                        }
                                     }
                                 }
-                            }
-                        });
-                        return null;
-                    }
-                };
+                            });
+                            return null;
+                        }
+                    };
 
-                new Thread(scrollAction).start();
+                    new Thread(scrollAction).start();
+                }
             }
         }
     }
@@ -144,6 +165,8 @@ public class DeskG {
     private void CloseViewBtn(){
         MainPane.setCenter(null);
         CloseViewButton.setDisable(true);
+        RadioMenuILoadButton.setDisable(false);
+        RadioMenuTLoadButton.setDisable(false);
         OpenButton.setDisable(false);
         System.gc(); //Try optimization
         //Reset offset
