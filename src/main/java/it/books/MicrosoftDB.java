@@ -95,4 +95,45 @@ public class MicrosoftDB {
         }
 
     }
+
+    /** Connect and search on the entire list of books from a given database
+     * @param dbFile specify the database file to work on
+     * @param author specify the book's author
+     * @param code specify the code of book
+     * @param genre specify the genre of book (could be Decimal/Dewey)
+     * @param title specify the book's title
+     * @return the list of books which matches with specified fields.
+     * **/
+    public static ArrayList<Book> connectAndSearch(File dbFile, String title, String code, String author, String genre){
+        String db = dbFile.getAbsolutePath().replace("\\", "/");
+        try(Connection conn = DriverManager.getConnection("jdbc:ucanaccess://"+db+";memory=true")){
+            Statement statement = conn.createStatement();
+            String query;
+            query = "SELECT * FROM LIBRI WHERE " + ((title.isEmpty())? "" : "titolo LIKE '%" + title + "%' ");
+            query += (title.isEmpty()&&(!code.isEmpty()))? "codice LIKE '%"+code+"%' " : (!code.isEmpty())? "AND WHERE codice LIKE '%" + code + "%' " : "";
+            query += (title.isEmpty()&&code.isEmpty()&&(!author.isEmpty()))? "autore LIKE '%" + author + "%' " : (!author.isEmpty())? "AND WHERE autore = '%" + author + "%' " : "";
+            query += (title.isEmpty()&&code.isEmpty()&&author.isEmpty()&&(!genre.isEmpty()))? "genere LIKE '%" + genre + "%' " : (!genre.isEmpty())? "AND WHERE genere LIKE '%" + genre + "%'" : "";
+            ResultSet res = statement.executeQuery(query);
+            ArrayList<Book> bookList = new ArrayList<>();
+            //Fetch results
+            while(res.next()){
+                Book book = new Book(res.getString("codice"), res.getString("titolo"));
+                book.setDetails(res.getString("autore"), res.getBoolean("unico_autore"), res.getString("collana"), res.getString("genere"), res.getString("editore"), res.getString("edizione"), res.getString("anno"));
+                book.setDetails(res.getString("scaffale"), (res.getString("pro_dal_gg") +"/" + (res.getString("pro_dal_mm") + "/" + res.getString("pro_dal_aa"))), res.getString("commento"));
+                book.setLocale(res.getString("nazione"), res.getString("traduttore"), res.getString("titolo_orig"));
+                book.setPages(res.getInt("pagine"), res.getString("formato"));
+                if(res.getBoolean("prestito")){
+                    book.setLeasing(true, (res.getString("pre_dal_gg") + "/" + res.getString("pre_dal_mm") + "/" + res.getString("pre_dal_aa")), res.getString("prestitario"));
+                }else{
+                    book.setLeasing(false, "", "");
+                }
+                bookList.add(book);
+            }
+            return bookList;
+
+        }catch (SQLException e){
+            return null;
+        }
+
+    }
 }

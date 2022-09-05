@@ -43,6 +43,12 @@
                   </RadioMenuItem>
                   <RadioMenuItem fx:id="RadioMenuTLoadButton" mnemonicParsing="false" text="Caricamento totale" toggleGroup="$view" />
                   <SeparatorMenuItem mnemonicParsing="false" />
+                  <RadioMenuItem fx:id="RadioMenuTViewModeButton" mnemonicParsing="false" selected="true" text="Vista tabella">
+                     <toggleGroup>
+                        <ToggleGroup fx:id="viewType" />
+                     </toggleGroup>
+                  </RadioMenuItem>
+                  <RadioMenuItem fx:id="RadioMenuTCViewModeButton" mnemonicParsing="false" text="Vista tabella + dettagli" toggleGroup="$viewType" />
                </items>
             </Menu>
             <Menu mnemonicParsing="false" text="Altro">

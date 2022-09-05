@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'it.books'
-version '1.0'
+version '1.0.2'
 
 repositories {
     mavenCentral()
@@ -21,7 +21,9 @@ jar{
 }
 
 dependencies {
-    // https://mvnrepository.com/artifact/net.sf.ucanaccess/ucanaccess
+    // Microsoft Database Handler (JDBC Driver)
     implementation 'net.sf.ucanaccess:ucanaccess:5.0.1'
 
+    // .ini file writer/parser
+    implementation 'org.ini4j:ini4j:0.5.4'
 }

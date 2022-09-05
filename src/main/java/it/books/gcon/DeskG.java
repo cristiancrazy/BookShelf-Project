@@ -1,9 +1,19 @@
+/* ========================================
+ * Author: Cristian Capraro
+ * September 2022
+ * This is controller class of desk.fxml
+ * ======================================== */
+
+
+
 package it.books.gcon;
 
 import it.books.base.Book;
 import it.books.MicrosoftDB;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -13,6 +23,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,9 +83,11 @@ public class DeskG {
     ToggleGroup view;
     @FXML
     RadioMenuItem RadioMenuTLoadButton, RadioMenuILoadButton;
-
     @FXML
-    private void OpenBtn(){
+    RadioMenuItem RadioMenuTViewModeButton, RadioMenuTCViewModeButton;
+
+    @FXML @SuppressWarnings("ConstantConditions")
+    private void OpenBtn() throws IOException {
         //Selecting files
         FileChooser dChooser = new FileChooser();
         dChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Database Microsoft", "*.mdb", "*.accdb"));
@@ -86,10 +99,14 @@ public class DeskG {
         }else{
             //Loading and operating with database files
             ArrayList<Book> book;
+            //Share info
+            OldDeskDetailG.getDBFile(dbFile);
 
             if(view.getToggles().get(0).isSelected()){ //Incremental load
                 RadioMenuILoadButton.setDisable(true);
                 RadioMenuTLoadButton.setDisable(true);
+                RadioMenuTCViewModeButton.setDisable(true);
+                RadioMenuTViewModeButton.setDisable(true);
 
                 book = MicrosoftDB.connectAndGet(dbFile, off, limit);
                 //Update offset
@@ -98,6 +115,8 @@ public class DeskG {
             else{ //Full load
                 RadioMenuILoadButton.setDisable(true);
                 RadioMenuTLoadButton.setDisable(true);
+                RadioMenuTCViewModeButton.setDisable(true);
+                RadioMenuTViewModeButton.setDisable(true);
 
                 book = MicrosoftDB.connectAndGet(dbFile);
 
@@ -122,7 +141,34 @@ public class DeskG {
                 table.getColumns().addAll(columns);
                 table.getItems().addAll(book);
                 table.setFixedCellSize(70);
-                MainPane.setCenter(table);
+
+                //Detailed View
+                if(RadioMenuTCViewModeButton.isSelected()){
+                    //Load Win
+                    Parent root = FXMLLoader.load(OldDeskDetailG.class.getResource("oldDeskDetails.fxml"));
+                    BorderPane pane = (BorderPane) root;
+
+                    Stage MainStage = (Stage) MainPane.getScene().getWindow();
+
+                    MainStage.widthProperty().addListener((obs, ov, nv) -> {
+                        double valueX = MainStage.getWidth();
+
+                        MainStage.heightProperty().addListener((bso, vo, vn) -> {
+                            double valueY = MainStage.getHeight() - 40;
+                            pane.setPrefSize(MainStage.getWidth(), valueY);
+                        });
+                        pane.setPrefSize(valueX, MainStage.getHeight() - 40);
+                    });
+
+
+                    //pane.setPrefSize(MainPane.getWidth(), MainPane.getHeight());
+                    pane.setCenter(table);
+                    pane.setPrefSize(MainStage.getWidth(),MainStage.getHeight() - 40);
+                    MainPane.setCenter(pane);
+                }else{
+                    MainPane.setCenter(table);
+                }
+
                 CloseViewButton.setDisable(false);
                 OpenButton.setDisable(true);
 
@@ -168,6 +214,8 @@ public class DeskG {
         RadioMenuILoadButton.setDisable(false);
         RadioMenuTLoadButton.setDisable(false);
         OpenButton.setDisable(false);
+        RadioMenuTCViewModeButton.setDisable(false);
+        RadioMenuTViewModeButton.setDisable(false);
         System.gc(); //Try optimization
         //Reset offset
         off = 0; finished = false;
