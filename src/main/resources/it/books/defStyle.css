@@ -1,0 +1,24 @@
+.root {
+    -fx-background-color: #c0c0c0;
+}
+
+.label {
+    -fx-font-family: "Arial Nova Cond";
+}
+
+#About {
+    -fx-font-family: "Arial Nova Cond";
+    -fx-font-size: 12pt;
+}
+
+.menu-item .label {
+    -fx-font-size: 12pt;
+}
+
+.menu-bar .label {
+    -fx-font-size: 11.5pt;
+}
+
+.menu-item:focused {
+    -fx-background-color: #595e72;
+}

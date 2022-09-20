@@ -10,8 +10,6 @@
  * --------------------------------------------------------------------
  * ==================================================================== */
 
-
-
 package it.books;
 
 import it.books.gcon.DeskG;
@@ -23,18 +21,23 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-
 import java.util.Objects;
 
 public class Main extends Application {
+    private final static String version = "1.0.3"; //App version
+
+    /** Return the current app version. **/
+    public static String getVersion(){
+        return version;
+    }
     @Override
     public void start(Stage stage) throws Exception {
         Parent root = FXMLLoader.load(Objects.requireNonNull(DeskG.class.getResource("desk.fxml")));
-        Scene scene = new Scene(root, 640, 480);
-        //scene.getStylesheets().add(DeskG.class.getResource("dark.css").toExternalForm());
-        //Setting minimals (Aspect ratio 4:3)
-        stage.setMinWidth(640);
-        stage.setMinWidth(480);
+        Scene scene = new Scene(root);
+        scene.getStylesheets().add(Objects.requireNonNull(this.getClass().getResource("defStyle.css")).toExternalForm());
+        //Setting minimals
+        stage.setMinWidth(800);
+        stage.setMinHeight(600);
         //Override exit button
         stage.setOnCloseRequest(i -> {
             i.consume();

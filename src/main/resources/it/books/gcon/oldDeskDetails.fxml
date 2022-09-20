@@ -39,7 +39,7 @@
                                     <Insets />
                                  </HBox.margin>
                               </Label>
-                              <TextField fx:id="CodeTextBox" alignment="CENTER_RIGHT" editable="false" prefHeight="26.0" prefWidth="180.0">
+                              <TextField fx:id="CodeTextBox" editable="false" prefHeight="26.0" prefWidth="220.0">
                                  <HBox.margin>
                                     <Insets left="20.0" />
                                  </HBox.margin>
@@ -53,7 +53,7 @@
                                     <Insets />
                                  </HBox.margin>
                               </Label>
-                              <TextField fx:id="PagesTextBox" alignment="CENTER_RIGHT" editable="false">
+                              <TextField fx:id="PagesTextBox" editable="false" prefHeight="26.0" prefWidth="220.0">
                                  <HBox.margin>
                                     <Insets left="29.0" />
                                  </HBox.margin>
@@ -67,7 +67,7 @@
                                     <Insets />
                                  </HBox.margin>
                               </Label>
-                              <TextField fx:id="TitleTextBox" alignment="CENTER_RIGHT" editable="false" prefHeight="26.0" prefWidth="179.0">
+                              <TextField fx:id="TitleTextBox" editable="false" prefHeight="26.0" prefWidth="220.0">
                                  <HBox.margin>
                                     <Insets left="26.0" />
                                  </HBox.margin>
@@ -81,7 +81,7 @@
                                     <Insets right="10.0" />
                                  </HBox.margin>
                               </Label>
-                              <TextField fx:id="EditionTextBox" alignment="CENTER_RIGHT" editable="false">
+                              <TextField fx:id="EditionTextBox" editable="false" prefHeight="26.0" prefWidth="220.0">
                                  <HBox.margin>
                                     <Insets left="10.0" />
                                  </HBox.margin>
@@ -95,7 +95,7 @@
                                     <Insets />
                                  </HBox.margin>
                               </Label>
-                              <TextField fx:id="GenreTextBox" alignment="CENTER_RIGHT" editable="false" prefHeight="26.0" prefWidth="180.0">
+                              <TextField fx:id="GenreTextBox" editable="false" prefHeight="26.0" prefWidth="220.0">
                                  <HBox.margin>
                                     <Insets left="18.0" />
                                  </HBox.margin>
@@ -109,7 +109,7 @@
                                     <Insets right="10.0" />
                                  </HBox.margin>
                               </Label>
-                              <TextField fx:id="EditorTextBox" alignment="CENTER_RIGHT" editable="false">
+                              <TextField fx:id="EditorTextBox" editable="false" prefHeight="26.0" prefWidth="220.0">
                                  <HBox.margin>
                                     <Insets left="17.0" />
                                  </HBox.margin>
@@ -126,7 +126,7 @@
                                     <Insets />
                                  </opaqueInsets>
                               </Label>
-                              <TextField fx:id="AuthorsTextBox" alignment="CENTER_RIGHT" editable="false" prefHeight="26.0" prefWidth="180.0">
+                              <TextField fx:id="AuthorsTextBox" editable="false" prefHeight="26.0" prefWidth="220.0">
                                  <HBox.margin>
                                     <Insets left="13.0" />
                                  </HBox.margin>
@@ -140,7 +140,7 @@
                                     <Insets right="10.0" />
                                  </HBox.margin>
                               </Label>
-                              <TextField fx:id="YearTextBox" alignment="CENTER_RIGHT" editable="false">
+                              <TextField fx:id="YearTextBox" editable="false" prefHeight="26.0" prefWidth="220.0">
                                  <HBox.margin>
                                     <Insets left="27.0" />
                                  </HBox.margin>
@@ -167,7 +167,7 @@
                         <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                            <children>
                               <Label text="Commenti" />
-                              <TextArea fx:id="CommentTextArea" editable="false" prefHeight="200.0" prefWidth="200.0">
+                              <TextArea fx:id="CommentTextArea" editable="false" prefHeight="50.0" prefWidth="220.0">
                                  <HBox.margin>
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                  </HBox.margin>
@@ -181,7 +181,7 @@
                                     <Insets right="15.0" />
                                  </HBox.margin>
                               </Label>
-                              <TextField fx:id="SeriesTextBox" editable="false" prefHeight="26.0" prefWidth="200.0" />
+                              <TextField fx:id="SeriesTextBox" editable="false" prefHeight="26.0" prefWidth="220.0" />
                            </children>
                         </HBox>
                         <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" GridPane.rowIndex="2">
@@ -191,7 +191,7 @@
                                     <Insets right="6.0" />
                                  </HBox.margin>
                               </Label>
-                              <TextField fx:id="PagesFormatTextBox" editable="false" prefHeight="26.0" prefWidth="200.0">
+                              <TextField fx:id="PagesFormatTextBox" editable="false" prefHeight="26.0" prefWidth="220.0">
                                  <HBox.margin>
                                     <Insets />
                                  </HBox.margin>
@@ -200,32 +200,32 @@
                         </HBox>
                         <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1">
                            <children>
-                              <Label text="Titolo originale">
+                              <Label text="T Originale">
                                  <HBox.margin>
                                     <Insets right="5.0" />
                                  </HBox.margin>
                               </Label>
-                              <TextField fx:id="OrigTitleTextBox" editable="false" prefHeight="26.0" prefWidth="200.0" />
+                              <TextField fx:id="OrigTitleTextBox" editable="false" prefHeight="26.0" prefWidth="220.0" />
                            </children>
                         </HBox>
                         <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                            <children>
                               <Label text="Nazione">
                                  <HBox.margin>
-                                    <Insets right="38.0" />
+                                    <Insets right="15.0" />
                                  </HBox.margin>
                               </Label>
-                              <TextField fx:id="CountryTextBox" editable="false" prefHeight="26.0" prefWidth="200.0" />
+                              <TextField fx:id="CountryTextBox" editable="false" prefHeight="26.0" prefWidth="220.0" />
                            </children>
                         </HBox>
                         <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
                            <children>
                               <Label text="Traduttore">
                                  <HBox.margin>
-                                    <Insets right="25.0" />
+                                    <Insets right="5.0" />
                                  </HBox.margin>
                               </Label>
-                              <TextField fx:id="TranslatorTextBox" editable="false" prefHeight="26.0" prefWidth="200.0" />
+                              <TextField fx:id="TranslatorTextBox" editable="false" prefHeight="26.0" prefWidth="220.0" />
                            </children>
                         </HBox>
                      </children>
@@ -236,10 +236,10 @@
                <content>
                   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                      <children>
-                        <VBox alignment="CENTER" prefHeight="187.0" prefWidth="200.0" spacing="10.0">
+                        <VBox alignment="CENTER" prefHeight="150.0" prefWidth="290.0" spacing="10.0">
                            <children>
                               <Label text="Codice" />
-                              <TextField fx:id="CodeSearchTextBox" prefHeight="26.0" prefWidth="200.0" />
+                              <TextField fx:id="CodeSearchTextBox" prefHeight="26.0" prefWidth="220.0" />
                               <Label text="Autore/i" />
                               <TextField fx:id="AuthorSearchTextBox" prefHeight="26.0" prefWidth="200.0" />
                            </children>
@@ -247,7 +247,7 @@
                               <Insets bottom="37.0" />
                            </HBox.margin>
                         </VBox>
-                        <VBox alignment="CENTER" prefHeight="187.0" prefWidth="200.0" spacing="10.0">
+                        <VBox alignment="CENTER" prefHeight="187.0" prefWidth="290.0" spacing="10.0">
                            <children>
                               <Label text="Titolo" />
                               <TextField fx:id="TitleSearchTextBox" prefHeight="26.0" prefWidth="200.0" />

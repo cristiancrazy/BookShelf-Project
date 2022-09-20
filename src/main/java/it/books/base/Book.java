@@ -7,7 +7,7 @@
 package it.books.base;
 import java.util.List;
 
-public class Book extends MetaBook {
+public final class Book extends MetaBook {
     private String code;
     private String title;
     private String author;
@@ -44,7 +44,6 @@ public class Book extends MetaBook {
     }
 
     //Non-static
-
 
     public void setLeasing(boolean lease, String leasingDate, String leasedTo) {
         this.leasing = (lease)? "Si" : "No";

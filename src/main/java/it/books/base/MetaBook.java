@@ -12,7 +12,7 @@ package it.books.base;
 
 import java.util.List;
 
-class MetaBook {
+abstract class MetaBook {
     protected static List<String> localeConfigField;
 
     //Init
