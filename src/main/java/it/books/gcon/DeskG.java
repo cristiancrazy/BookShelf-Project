@@ -4,8 +4,6 @@
  * This is controller class of desk.fxml
  * ======================================== */
 
-
-
 package it.books.gcon;
 
 import it.books.Main;

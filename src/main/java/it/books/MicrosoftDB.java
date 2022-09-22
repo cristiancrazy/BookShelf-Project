@@ -11,15 +11,14 @@ package it.books;
 import com.healthmarketscience.jackcess.*;
 import it.books.base.Book;
 import it.books.base.EvBook;
-import org.hsqldb.types.Charset;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MicrosoftDB {
     /** Connect and retrieve a list of books from a given database
@@ -212,7 +211,7 @@ public class MicrosoftDB {
             Row row;
             while(rows.hasNext()){
                 row = rows.next();
-                if((row.getShort("ID") == id) || (row.getString("Codice").equals("code")) || (row.getString("Titolo").equals(title))){
+                if((row.getString("Codice").equals("code")) || (row.getString("Titolo").equals(title))){
                     db.getTable("LIBRI").deleteRow(row);
                     db.flush();
                     return true;
@@ -222,5 +221,40 @@ public class MicrosoftDB {
         }catch (IOException e){
             return false;
         }
+    }
+
+    /**
+     * This method is used to connect to local db and retrieve the last id number.
+     * @param dbFile specify the database file to work on
+     * @return integer result of the last registered id. Return -1 if an error occurred.
+     **/
+    public static int connectAndGetLastID(File dbFile){
+        String path = dbFile.getAbsolutePath();
+        path = path.replace("\\", "/"); //Solve a bug
+        try(Connection db = DriverManager.getConnection("jdbc:ucanaccess://"+path+";memory=true")){
+            ResultSet res = db.createStatement().executeQuery("SELECT * FROM LIBRI ORDER BY ID DESC LIMIT 1");
+            res.next(); //Skip and read the first row
+            return res.getInt("ID");
+        }catch (SQLException exc){
+            //Debug exc.printStackTrace();
+            return -1;
+        }
+    }
+
+    /** Connect to the database file and add a new book entry
+     * @param dbFile specify the database which work on;
+     * @param book the adv. book element to add to the database;
+     * @return true whether the procedure was successful. Otherwise, if error occurred, it returns false.
+     * **/
+    public static int connectAndUploadANewBook(File dbFile, EvBook book){
+        try(Database db = DatabaseBuilder.open(dbFile)){
+            db.getTable("LIBRI").addRow(null, book.getCode(), book.getTitle(), book.getAuthors(), book.getGenre(), book.getPublisher(), book.getEdition(), book.getSeries(), book.getOwnDate(), Short.parseShort(Integer.toString(book.getPages())), Short.parseShort(book.getYear()), book.getCountry(), book.getShelf(), null, book.getPagesFormat(), null, book.getOriginal());
+            db.flush();
+        }catch (IOException e){
+            System.out.println("Impossibile aggiungere il libro al database.");
+            //Debug e.printStackTrace();
+            return -1;
+        }
+        return 0;
     }
 }

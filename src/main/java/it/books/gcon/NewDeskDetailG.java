@@ -1,11 +1,17 @@
+/* =================================================
+ * Author: Cristian Capraro
+ * Personal Project under MIT Licence
+ * This class is the graphic controller to work on
+ * new Microsoft database specific format.
+ * ================================================= */
+
 package it.books.gcon;
 
 import it.books.MicrosoftDB;
 import it.books.base.EvBook;
 import javafx.concurrent.Task;
-import javafx.concurrent.Worker;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -21,6 +27,8 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Objects;
 import java.util.Optional;
 
 public class NewDeskDetailG {
@@ -31,6 +39,7 @@ public class NewDeskDetailG {
 	 * get the working database path **/
 	public static void setWorkingDB(File dbFile) {
 		workingDB = dbFile;
+		AddBookFormG.setWorkingDB(workingDB);
 	}
 
 	//On init
@@ -65,7 +74,7 @@ public class NewDeskDetailG {
 	@FXML
 	BorderPane MainPane;
 	@FXML
-	Button AddBookBtn, RemBookBtn, ModBookBtn, DetailBtn, LeaseBtn;
+	Button AddBookBtn, RemBookBtn, DetailBtn, LeaseBtn;
 	@FXML
 	TextField TitleTextBox, AuthorsTextBox, GenreTextBox, YearTextBox, EditionTextBox, PageTextBox, CodeTextBox;
 	@FXML
@@ -84,17 +93,33 @@ public class NewDeskDetailG {
 		alert.showAndWait().ifPresent(btn -> {
 			if(btn.equals(ButtonType.YES)){
 				table.getItems().remove(selected);
-				MicrosoftDB.DeleteEntry(workingDB, (int) selected.getId(), selected.getCode(), selected.getTitle());
-			}else return;
+				MicrosoftDB.DeleteEntry(workingDB, -1, selected.getCode(), selected.getTitle());
+			}
 		});
 	}
 
-	@FXML
-	public void ModifyBookButton(){
-
-	}
-
+	@SuppressWarnings("unchecked")
 	public void AddBookButton() {
+		AddBookFormG.setParent((TableView<EvBook>) MainPane.getCenter());
+		try{
+			Parent addBk = FXMLLoader.load(Objects.requireNonNull(AddBookFormG.class.getResource("addBookForm.fxml")));
+			Scene scene = new Scene(addBk);
+			Stage stage = new Stage();
+			stage.setScene(scene);
+			stage.setResizable(false);
+			stage.setIconified(false);
+			stage.initStyle(StageStyle.UNDECORATED);
+			stage.show();
+			stage.setOnHiding(ref -> {
+				((TableView<EvBook>) MainPane.getCenter()).getItems().clear();
+				((TableView<EvBook>) MainPane.getCenter()).getItems().addAll(MicrosoftDB.connectAndGetNew(workingDB)); //Reload db
+			});
+			stage.setOnShowing(ref -> {
+				AddBookBtn.setDisable(true);
+			});
+		}catch (IOException ignored){
+			AddBookBtn.setDisable(false);
+		};
 
 	}
 
@@ -142,9 +167,8 @@ public class NewDeskDetailG {
 		stage.setResizable(false);
 		stage.setMaximized(false);
 		stage.centerOnScreen();
+		stage.setAlwaysOnTop(true);
 		stage.setScene(scene);
 		stage.show();
-
-
 	}
 }

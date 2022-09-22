@@ -149,11 +149,6 @@
                   <Insets top="20.0" />
                </VBox.margin>
             </Button>
-            <Button fx:id="ModBookBtn" contentDisplay="CENTER" mnemonicParsing="false" onAction="#ModifyBookButton" text="Modifica Libro">
-               <VBox.margin>
-                  <Insets top="20.0" />
-               </VBox.margin>
-            </Button>
          </children>
       </VBox>
    </right>

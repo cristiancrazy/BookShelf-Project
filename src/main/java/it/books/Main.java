@@ -24,7 +24,7 @@ import javafx.stage.Stage;
 import java.util.Objects;
 
 public class Main extends Application {
-    private final static String version = "1.0.3"; //App version
+    private final static String version = "1.0.4"; //App version
 
     /** Return the current app version. **/
     public static String getVersion(){
