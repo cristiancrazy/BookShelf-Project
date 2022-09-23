@@ -21,10 +21,13 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.Objects;
 
 public class Main extends Application {
-    private final static String version = "1.0.4"; //App version
+    private final static String version = "1.0.5"; //App version
 
     /** Return the current app version. **/
     public static String getVersion(){
@@ -52,7 +55,16 @@ public class Main extends Application {
         stage.show();
     }
 
+    /** Check for application updates **/
+    private static void checkUpdates(){
+        try{
+            Process ps = new ProcessBuilder("java", "-jar", "."+ File.separator+"Updater-1.0.0.jar", getVersion(), Long.toString(ProcessHandle.current().pid())).start();
+            ps.waitFor();
+        }catch (InterruptedException | IOException ignored){ }
+    }
+
     public static void main(String[] args) {
+        checkUpdates();
         launch();
     }
 }

@@ -1,2 +1,4 @@
 rootProject.name = 'BookShelf'
+include 'Updater'
+include 'Updater'
 
