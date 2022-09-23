@@ -27,20 +27,21 @@ Unicode true
 !insertmacro MUI_LANGUAGE Italian
 
 # =========== Install Section ===========
-Section "BookShelf V. 1.0" BookShelf
+Section "BookShelf V. 1.0.5" BookShelf
+
     SetOutPath "$INSTDIR"
-    File "BookShelf-1.0.jar"
+    File "BookShelf-1.0.5.jar"
+    File "Updater-1.0.0.jar"
     WriteUninstaller "$INSTDIR\Uninstall.exe" ; Create unistaller
     SetOutPath "$desktop"
     File "jre.msi"
 
-    CreateShortCut "$desktop\BookShelf.lnk" "$INSTDIR\BookShelf-1.0.jar"
+    CreateShortCut "$desktop\BookShelf.lnk" "$INSTDIR\BookShelf-1.0.5.jar"
 SectionEnd
 
 Section "Uninstall"
     Delete "$INSTDIR\Uninstall.exe"
-    Delete "$INSTDIR\BookShelf-1.0.jar"
-    RMDir "$INSTDIR"
+    Delete "$INSTDIR\BookShelf-1.0.5.jar"
 SectionEnd
 
 LangString DESC_BookShelf ${LANG_ITALIAN} "Programma principale"
