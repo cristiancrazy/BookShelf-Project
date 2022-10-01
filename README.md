@@ -1,20 +1,17 @@
 ## Descrizione progetto
-BookShelf è un programma di catalogazione bibliotecario, realizzato per sostituire STLW (rilasciato nel 1992).
-Questo software purtroppo non è in grado di leggere direttamente i file database generati da STLW, quindi sarà
-necessario provvedere alla conversione tramite dei software adeguati (Access 1997 e 2003 in VM).
+### Cos'è?
+BookShelf è un software di catalogazione bibliotecario, rivolto principalmente a privati e biblioteche locali che non possiedono
+un software di catalogazione.
+### Updater
+Il programma è attualmente in fase di sviluppo, e dalla *versione 1.0.5* è stato integrato un
+programma di aggiornamento automatico, che si avvia ogni qualvolta viene avviato BookShelf.
+
+Questo progetto, i file sorgente, gli eseguibili e gli altri file, sono rilasciati al pubblico con licenza MIT.
+### Maggiori info
+Maggiori informazioni sul progetto: [BookShelf Homepage](https://bookshelf.rootlet.it)
+
 ___________________________________________________________________________________________________________________________
 ## Requisiti
-### Necessari
-Per poter eseguire il programma sarà necessario scaricare e installare il JRE, l'ambiente di esecuzione dei programmi Java.
-- **JRE**: [Windows x64](https://download.bell-sw.com/java/17.0.4.1+1/bellsoft-jre17.0.4.1+1-windows-amd64-full.msi) o [Windows x86](https://download.bell-sw.com/java/17.0.4.1+1/bellsoft-jre17.0.4.1+1-windows-i586-full.msi) / 
-[Mac OS](https://download.bell-sw.com/java/17.0.4.1+1/bellsoft-jre17.0.4.1+1-macos-amd64-full.dmg) /
-[Linux (Debian)](https://download.bell-sw.com/java/17.0.4.1+1/bellsoft-jre17.0.4.1+1-linux-amd64-full.deb)
-### Minimi
-- Processore: Intel Pentium 4 HT
-- Memoria: 1 GB
-- Connessione a Internet
-### Consigliati
-- Processore: Intel/AMD Dual Core
-- Memoria: 2 GB
-- Connessione a Internet
+I requisiti necessari, minimi e consigliati sono disponibili alla pagina: [BookShelf Homepage](https://bookshelf.rootlet.it)
+
 ___________________________________________________________________________________________________________________________
