@@ -14,7 +14,7 @@ import javax.naming.ldap.InitialLdapContext;
 
 public class EvBook {
 	//Lease structure
-	private class Lease{
+	private static class Lease{
 		public Lease(){}; //Init (not in lease)
 
 		public void setLease(String LeaseBegin, String LeaseExpectedEnd, String Name, String Surname, String Tel){
@@ -61,6 +61,10 @@ public class EvBook {
 
 		public String getSurname() {
 			return Surname;
+		}
+
+		public String getTel() {
+			return Tel;
 		}
 
 		@Override
@@ -117,6 +121,10 @@ public class EvBook {
 
 	public Lease getLease() {
 		return lease;
+	}
+
+	public boolean isLeasing(){
+		return lease.isInLeasing();
 	}
 
 	public void addDetails(String originalTitle, String genre, String year, String edition, String publisher, String series, int pages, String pageFormat, String country, String shelf, String ownDate){
@@ -199,4 +207,16 @@ public class EvBook {
 		return authors;
 	}
 
+	public String getBeginDate(){
+		return lease.getLeaseBegin();
+	}
+
+	public String getEndDate(){
+		return lease.getLeaseExpectedEnd();
+	}
+
+	public String leasedTo(){
+		if(!isLeasing()) return null;
+		return lease.getName() + ";" + lease.getSurname() + ";" + lease.getTel();
+	}
 }

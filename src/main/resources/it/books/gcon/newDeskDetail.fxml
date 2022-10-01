@@ -123,7 +123,7 @@
                   <Insets right="20.0" />
                </GridPane.margin>
             </TextField>
-            <Button fx:id="LeaseBtn" mnemonicParsing="false" text="Gestione prestiti" GridPane.columnIndex="3" GridPane.rowIndex="3">
+            <Button fx:id="LeaseBtn" mnemonicParsing="false" onAction="#LeaseButton" text="Gestione prestiti" GridPane.columnIndex="3" GridPane.rowIndex="3">
                <GridPane.margin>
                   <Insets left="115.0" />
                </GridPane.margin>

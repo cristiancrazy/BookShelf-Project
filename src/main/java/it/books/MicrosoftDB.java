@@ -15,9 +15,12 @@ import it.books.base.EvBook;
 import java.io.File;
 import java.io.IOException;
 import java.sql.*;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MicrosoftDB {
@@ -150,7 +153,8 @@ public class MicrosoftDB {
             table2.addColumns(List.of(
                     new ColumnBuilder("Codice", DataType.TEXT),
                     new ColumnBuilder("In_Prestito", DataType.BOOLEAN),
-                    new ColumnBuilder("Data_Prestito", DataType.SHORT_DATE_TIME),
+                    new ColumnBuilder("Data_Inizio_Prestito", DataType.TEXT),
+                    new ColumnBuilder("Data_Fine_Prestito", DataType.TEXT),
                     new ColumnBuilder("Prestato_A", DataType.TEXT)
             )).toTable(db);
 
@@ -180,6 +184,11 @@ public class MicrosoftDB {
             while(res.next()){
                 EvBook book = new EvBook(res.getInt("ID"), res.getString("Codice"), res.getString("Titolo"), res.getString("Autore"));
                 book.addDetails(res.getString("Titolo_Originale"), res.getString("Genere"), res.getString("Anno_Pubblicazione"), res.getString("Edizione"), res.getString("Editore"), res.getString("Collezione"), res.getInt("Pagine"), res.getString("Formato_Pagine"), res.getString("Nazione"), res.getString("Scaffale"), res.getString("Posseduto_Dal"));
+                ResultSet pre = query.executeQuery("SELECT * FROM PRESTITI WHERE Codice=\""+book.getCode()+"\"");
+                if(pre.next()){
+                    book.setLease(pre.getString("Data_Inizio_Prestito"), pre.getString("Data_Fine_Prestito"), pre.getString("Prestato_A").split(";")[0], pre.getString("Prestato_A").split(";")[1], pre.getString("Prestato_A").split(";")[2]);
+                }
+
                 books.add(book);
             }
             return books;
@@ -208,13 +217,20 @@ public class MicrosoftDB {
     public static boolean DeleteEntry(File dbFile, int id, String code, String title) {
         try(Database db = DatabaseBuilder.open(dbFile)){
             Iterator<Row> rows = db.getTable("LIBRI").iterator();
-            Row row;
+            Iterator<Row> prestitiRows = db.getTable("PRESTITI").iterator();
+            Row row, row2;
             while(rows.hasNext()){
                 row = rows.next();
-                if((row.getString("Codice").equals("code")) || (row.getString("Titolo").equals(title))){
+                if((row.getString("Codice").equals(code)) || (row.getString("Titolo").equals(title))){
                     db.getTable("LIBRI").deleteRow(row);
                     db.flush();
-                    return true;
+                }
+            }
+            while(prestitiRows.hasNext()){
+                row2 = prestitiRows.next();
+                if((row2.getString("Codice").equals(code))){
+                    db.getTable("PRESTITI").deleteRow(row2);
+                    db.flush();
                 }
             }
             return false; //Not found
@@ -250,11 +266,60 @@ public class MicrosoftDB {
         try(Database db = DatabaseBuilder.open(dbFile)){
             db.getTable("LIBRI").addRow(null, book.getCode(), book.getTitle(), book.getAuthors(), book.getGenre(), book.getPublisher(), book.getEdition(), book.getSeries(), book.getOwnDate(), Short.parseShort(Integer.toString(book.getPages())), Short.parseShort(book.getYear()), book.getCountry(), book.getShelf(), null, book.getPagesFormat(), null, book.getOriginal());
             db.flush();
+            if(book.isLeasing()){
+                //Codice, is in leasing, data inzio, data fine, a...
+                String[] personData = book.leasedTo().split(";");
+                db.getTable("PRESTITI").addRow(book.getCode(), book.isLeasing(), book.getBeginDate(), book.getEndDate(), personData[0]+";"+personData[1]+";"+personData[2]);
+                db.flush();
+            }
         }catch (IOException e){
             System.out.println("Impossibile aggiungere il libro al database.");
             //Debug e.printStackTrace();
             return -1;
         }
         return 0;
+    }
+
+    /** Search by code (on newest database)
+     * @param dbFile specify the database which work on;
+     * @param code specify the book code;
+     * **/
+    public static EvBook connectAndSearch(File dbFile, String code){
+        String path = dbFile.getAbsolutePath();
+        path = path.replace("\\", "/"); //Solve a bug
+        try(Connection db = DriverManager.getConnection("jdbc:ucanaccess://"+path+";memory=true")){
+            Statement st = db.createStatement();
+            ResultSet res = st.executeQuery("SELECT * FROM LIBRI WHERE Codice = '"+code+"'");
+            while (res.next()){
+                EvBook book = new EvBook(res.getInt("ID"), res.getString("Codice"), res.getString("Titolo"), res.getString("Autore"));
+                book.addDetails(res.getString("Titolo_Originale"), res.getString("Genere"), res.getString("Anno_Pubblicazione"), res.getString("Edizione"), res.getString("Editore"), res.getString("Collezione"), res.getInt("Pagine"), res.getString("Formato_Pagine"), res.getString("Nazione"), res.getString("Scaffale"), res.getString("Posseduto_Dal"));
+                return book;
+            }
+        }catch (Exception e){
+            return null;
+        }
+        return null;
+    }
+
+    /** Connect to the database and add a new lease entry
+     * @param dbFile specify the database which work on;
+     * @param code specify the book code
+     * @param beginDate specify the beginning of leasing;
+     * @param expectedEnd specify the expected end of leasing;
+     * @param name specify the name of user;
+     * @param surname specify the surname of user;
+     * @param tel specify the phone number of user;
+     * **/
+    public static void connectAndAddLease(File dbFile, String code, LocalTime beginDate, LocalTime expectedEnd, String name, String surname, String tel){
+        ArrayList<EvBook> books = connectAndGetNew(dbFile);
+        try{
+            EvBook data = books.stream().filter(e -> e.getCode().equals(code)).findFirst().orElse(null);
+            if(data == null) return;
+            data.setLease(beginDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")), expectedEnd.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")), name, surname, tel);
+            DeleteEntry(dbFile, -1, null, data.getTitle());
+            connectAndUploadANewBook(dbFile, data);
+        }catch (NoSuchElementException e){
+            return;
+        }
     }
 }

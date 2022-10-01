@@ -171,4 +171,27 @@ public class NewDeskDetailG {
 		stage.setScene(scene);
 		stage.show();
 	}
+
+	@SuppressWarnings("unchecked")
+	public void LeaseButton(){
+		LeasingDetailedG.setDbFile(workingDB);
+		TableView<EvBook> table = (TableView<EvBook>) MainPane.getCenter();
+		if(table.getFocusModel().getFocusedItem() != null){
+			LeasingDetailedG.setSelected(table.getFocusModel().getFocusedItem());
+			try{
+				Parent lease = FXMLLoader.load(Objects.requireNonNull(LeasingDetailedG.class.getResource("leasingDetailed.fxml")));
+				Scene scene = new Scene(lease);
+				Stage stage = new Stage();
+				stage.setScene(scene);
+				stage.setResizable(false);
+				stage.centerOnScreen();
+				stage.initStyle(StageStyle.UNDECORATED);
+				stage.show();
+				stage.setOnHiding(i -> {
+					((TableView<EvBook>) MainPane.getCenter()).getItems().clear();
+					((TableView<EvBook>) MainPane.getCenter()).getItems().addAll(MicrosoftDB.connectAndGetNew(workingDB)); //Reload db
+				});
+			}catch (IOException ignored){ }
+		}
+	}
 }

@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.util.Objects;
 
 public class Main extends Application {
-    private final static String version = "1.0.5"; //App version
+    private final static String version = "1.0.6"; //App version
 
     /** Return the current app version. **/
     public static String getVersion(){
