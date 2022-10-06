@@ -9,18 +9,25 @@
 package it.books.gcon;
 
 import it.books.Main;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import org.ini4j.Wini;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 public class CreateNewDeskG {
+
+	//Flags and local variables
+	private static Path dbToConvert = null;
+
 
 	@FXML
 	private void initialize(){
@@ -81,6 +88,9 @@ public class CreateNewDeskG {
 							configFile.put("BookShelf App", "Database", "NEW_ACCDB");
 							configFile.put("BookShelf App", "Created on", LocalDateTime.now());
 							configFile.put("BookShelf App", "Status", "INIT_REQUIRED");
+							if(!Objects.isNull(dbToConvert)){
+								configFile.put("BookShelf App", "Source", dbToConvert.toAbsolutePath().toString());
+							}
 							configFile.store();
 
 							DBPath.resolve(dbName + ".accdb").toFile().createNewFile();
@@ -117,4 +127,14 @@ public class CreateNewDeskG {
 		MainPane.getScene().getWindow().hide(); //Hide the config window
 	}
 
+
+	//Select database to convert if any available
+	public void SourceToConvertBtn() {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Microsoft Database", "*.mdb", "*.accdb"));
+		File chosen = fileChooser.showOpenDialog(null);
+		if(!Objects.isNull(chosen)){
+			dbToConvert = chosen.toPath();
+		}
+	}
 }

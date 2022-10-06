@@ -22,12 +22,11 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 
 public class Main extends Application {
-    private final static String version = "1.0.6"; //App version
+    private final static String version = "1.0.7"; //App version
 
     /** Return the current app version. **/
     public static String getVersion(){
@@ -56,9 +55,9 @@ public class Main extends Application {
     }
 
     /** Check for application updates **/
-    private static void checkUpdates(){
+    public static void checkUpdates(){
         try{
-            Process ps = new ProcessBuilder("java", "-jar", "."+ File.separator+"Updater-1.0.0.jar", getVersion(), Long.toString(ProcessHandle.current().pid())).start();
+            Process ps = new ProcessBuilder("java", "-jar", "Updater-1.0.1.jar", getVersion(), Long.toString(ProcessHandle.current().pid())).start();
             ps.waitFor();
         }catch (InterruptedException | IOException ignored){ }
     }

@@ -12,13 +12,13 @@ package updater;
 
 import javax.net.ssl.SSLHandshakeException;
 import javax.swing.*;
-import javax.swing.plaf.ProgressBarUI;
 import java.awt.*;
 import java.io.*;
 import java.net.*;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.HashMap;
+import java.util.concurrent.Semaphore;
 
 import static java.lang.System.exit;
 import static java.lang.System.out;
@@ -27,6 +27,7 @@ public class Runner {
 	//Mirror
 	private final static String mirrorLink = "https://bookshelf.rootlet.it/get-version.txt";
 	private static int progressValue = 0;
+	private static final Semaphore sem = new Semaphore(1); //Semaphore for progressValue
 
 	@SuppressWarnings("unchecked")
 	public static void main(String[] args) {
@@ -68,13 +69,16 @@ public class Runner {
 					JOptionPane.showMessageDialog(null, "Non sono disponibili ulteriori aggiornamenti\nUltima versione installata\nPremere OK per uscire");
 					exit(0);
 				}else{
-					JOptionPane.showMessageDialog(null, "Aggiornamento (patch/sicurezza)\nPremere OK per continuare");
+					int res = JOptionPane.showOptionDialog(null, "Aggiornamento (patch/sicurezza)\nPremere OK per continuare", "Aggiornamento disponibile", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null, null, null);
+					if(res == JOptionPane.CANCEL_OPTION) exit(0);
 				}
 			}else{
-				JOptionPane.showMessageDialog(null, "Aggiornamento (minor/funzioni)\nPremere OK per continuare");
+				int res = JOptionPane.showOptionDialog(null, "Aggiornamento (minor/funzioni)\nPremere OK per continuare", "Aggiornamento disponibile", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null, null, null);
+				if(res == JOptionPane.CANCEL_OPTION) exit(0);
 			}
 		}else{
-			JOptionPane.showMessageDialog(null, "Aggiornamento importante (major/funzioni)\nPremere OK per continuare");
+			int res = JOptionPane.showOptionDialog(null, "Aggiornamento importante! (major/critico)\nPremere OK per continuare", "Aggiornamento disponibile", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null, null, null);
+			if(res == JOptionPane.CANCEL_OPTION) exit(0);
 		}
 
 		try{
@@ -102,41 +106,56 @@ public class Runner {
 				c.gridx = 0;
 				c.gridy = 1;
 				pane.add(progressBar, c);
+
+				//Progress bar thread
 				Runnable pgBarSet = () -> {
 					while(getProgressValue() != 100){
 						progressBar.setValue(getProgressValue());
-						try{
-							Thread.sleep(1000);
-						}catch (Exception ignored){}
+						try {
+							sem.acquire(); //Semaphore use
+						} catch (InterruptedException ignored) {}
 					}
 					try{
 						Thread.sleep(5000);
 					}catch (Exception ignored){ }
 					JOptionPane.showMessageDialog(null, "Aggiornamento completato\nPremere OK per chiudere");
-					System.exit(0);
+					exit(0);
 				};
+
 				pane.setResizable(false);
+				pane.setLocationRelativeTo(null);
 				pane.setVisible(true);
 				new Thread(pgBarSet).start();
 			};
 			new Thread(updatePanel).start();
 
 			progressValue = 0;
+			sem.release();
 			//Close App
 			CloseBookShelf(Long.parseLong(args[1]));
 			progressValue = 15;
+			sem.release();
+
 			downloadFile(ProgramSource.toURL());
 			progressValue = 50;
+			sem.release();
 			ProcessBuilder Uninstall = new ProcessBuilder(".\\Uninstall.exe");
 			Process uninstallPS = Uninstall.start();
-			uninstallPS.waitFor();
+			Thread.sleep(15000); //Sleep for 15 seconds
 			progressValue = 60;
+			sem.release();
 
 			ProcessBuilder Install = new ProcessBuilder("\""+System.getProperty("user.home")+File.separator+"BookShelf-Installer.exe"+"\"");
 			Process installPS = Install.start();
 			progressValue = 70;
+			sem.release();
 			installPS.waitFor();
+			Thread.sleep(15000); //Sleep for 15 seconds
+			progressValue = 99;
+			sem.release();
+			Thread.sleep(1000); //Delay 1s
 			progressValue = 100;
+			sem.release();
 		}catch (IOException exc){
 			JOptionPane.showMessageDialog(null, "Errore. Si prega di riprovare tra qualche istante.");
 			exit(239);

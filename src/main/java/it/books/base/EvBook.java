@@ -10,8 +10,6 @@
 
 package it.books.base;
 
-import javax.naming.ldap.InitialLdapContext;
-
 public class EvBook {
 	//Lease structure
 	private static class Lease{
@@ -99,6 +97,9 @@ public class EvBook {
 	private String country;
 	private String shelf;
 
+	//Other
+	private String comments;
+
 	private String ownDate;
 
 	//Constructor and getter
@@ -106,7 +107,8 @@ public class EvBook {
 		this.id = id;
 		this.code = code;
 		this.title = title;
-		this.authors = authors.replace(";", ", ");
+		if(authors != null)
+			this.authors = authors.replace(";", ", ");
 	}
 
 	public Lease lease = new Lease();
@@ -119,8 +121,16 @@ public class EvBook {
 		lease.setLease(LeaseBegin, LeaseExpectedEnd, Name, Surname, Tel);
 	}
 
+	public void setComments(String comments){
+		this.comments = comments;
+	}
+
 	public Lease getLease() {
 		return lease;
+	}
+
+	public String getComments() {
+		return comments;
 	}
 
 	public boolean isLeasing(){
@@ -219,4 +229,5 @@ public class EvBook {
 		if(!isLeasing()) return null;
 		return lease.getName() + ";" + lease.getSurname() + ";" + lease.getTel();
 	}
+
 }

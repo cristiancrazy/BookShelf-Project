@@ -9,6 +9,7 @@ package it.books.gcon;
 import it.books.Main;
 import it.books.base.Book;
 import it.books.MicrosoftDB;
+import it.books.base.BookConverter;
 import it.books.base.EvBook;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -31,6 +32,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class DeskG {
 
@@ -40,7 +42,8 @@ public class DeskG {
     }
 
     /* Flags - Database loading checkpoint */
-    private static int off = 0, limit = 50;
+    private static int off = 0;
+    private static final int limit = 50;
     private static boolean finished = false;
 
     @FXML
@@ -52,6 +55,9 @@ public class DeskG {
 
     @FXML
     private MenuItem OpenButton, CreateButton;
+
+    @FXML
+    private MenuItem CheckUpdatesButton;
 
     @FXML
     private void CloseBtn() {
@@ -126,6 +132,24 @@ public class DeskG {
                             config.put("BookShelf App", "Status", "READY");
                             config.store(configFile);
                         }
+
+                        try{
+                            String dbSource = config.get("BookShelf App", "Source");
+                            if(Objects.nonNull(dbSource)){
+                                File source = new File(dbSource);
+                                if(source.exists()){
+                                    List<EvBook> converted = MicrosoftDB.connectAndGet(source, 0, 0).stream().map(i -> BookConverter.ConvertToEvBook(i, -1)).toList();
+                                    for(EvBook book : converted){
+                                        MicrosoftDB.connectAndUploadANewBook(dbFile, book);
+                                    }
+                                }else{
+                                    new Alert(Alert.AlertType.ERROR, "File sorgente non valido o inesistente!\nIl database viene vuoto.", ButtonType.OK).show();
+                                }
+                            }
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+
                     }
 
                     //Loading and operating with db file (new .accdb database)
@@ -167,6 +191,7 @@ public class DeskG {
                     RadioMenuTCViewModeButton.setDisable(true);
                     RadioMenuTViewModeButton.setDisable(true);
                     CloseViewButton.setDisable(false);
+                    CheckUpdatesButton.setDisable(true);
 
                     //Load interface
                     Parent root = FXMLLoader.load(NewDeskDetailG.class.getResource("newDeskDetail.fxml"));
@@ -193,7 +218,7 @@ public class DeskG {
             }catch (Exception notFound){
                 //Debug notFound.printStackTrace();
                 //Loading and operating with database files
-                ArrayList<Book> book;
+                ArrayList<Book> book = new ArrayList<>();
                 //Share info
                 OldDeskDetailG.getDBFile(dbFile);
 
@@ -213,12 +238,12 @@ public class DeskG {
                     RadioMenuTCViewModeButton.setDisable(true);
                     RadioMenuTViewModeButton.setDisable(true);
 
-                    book = MicrosoftDB.connectAndGet(dbFile);
+                    book = MicrosoftDB.connectAndGet(dbFile, 0, 0);
 
                 }
 
                 if(book == null){
-                    Alert msg = new Alert(Alert.AlertType.ERROR, "Errore del file. Non \u00E8 stata trovata una nessuna valida nel file selezionato.", ButtonType.OK);
+                    Alert msg = new Alert(Alert.AlertType.ERROR, "Errore del file. Non sono state trovate tabelle valide nel file selezionato.", ButtonType.OK);
                     msg.show();
                 }else{
                     TableView<Book> table = new TableView<>();
@@ -324,8 +349,13 @@ public class DeskG {
         OpenButton.setDisable(false);
         RadioMenuTCViewModeButton.setDisable(false);
         RadioMenuTViewModeButton.setDisable(false);
+        CheckUpdatesButton.setDisable(false);
         System.gc(); //Try optimization
         //Reset offset
         off = 0; finished = false;
+    }
+
+    public void UpdatesBtn() {
+        Main.checkUpdates();
     }
 }

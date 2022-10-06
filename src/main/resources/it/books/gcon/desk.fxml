@@ -54,6 +54,7 @@
             <Menu mnemonicParsing="false" text="Altro">
                <items>
                   <MenuItem fx:id="AboutButton" mnemonicParsing="false" onAction="#AboutBtn" text="Informazioni..." />
+                  <MenuItem fx:id="CheckUpdatesButton" mnemonicParsing="false" onAction="#UpdatesBtn" text="Aggiornamenti" />
                </items>
             </Menu>
         </menus>
