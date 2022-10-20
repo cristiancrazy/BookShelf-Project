@@ -87,8 +87,9 @@ public class LeasingDetailedG {
 			try {
 				EvBook book = Objects.requireNonNull(MicrosoftDB.connectAndSearch(dbFile, CodeAndTitle.getText()));
 				book.setLease(BeginLease.getValue().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")), EndLease.getValue().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")), Name.getText(), Surname.getText(), TelBox.getText());
-				MicrosoftDB.DeleteEntry(dbFile, -1, book.getCode(), book.getTitle());
-				MicrosoftDB.connectAndUploadANewBook(dbFile, book);
+				MicrosoftDB.connectAndAddLease(dbFile, book);
+				//MicrosoftDB.DeleteEntry(dbFile, -1, book.getCode(), book.getTitle());
+				//MicrosoftDB.connectAndUploadANewBook(dbFile, book);
 				new Alert(Alert.AlertType.INFORMATION, "Prestito aggiunto", ButtonType.OK).showAndWait().ifPresentOrElse(i -> {MainPane.getScene().getWindow().hide();}, () -> {MainPane.getScene().getWindow().hide();});
 			} catch (NullPointerException e) {
 				new Alert(Alert.AlertType.ERROR, "Errore: Impossibile aggiornare il database.", ButtonType.OK).showAndWait();
@@ -97,9 +98,7 @@ public class LeasingDetailedG {
 	}
 
 	public void Unlock(){ //Remove leasing
-		selected.endLease();
-		MicrosoftDB.DeleteEntry(dbFile, -1, selected.getCode() , selected.getTitle());
-		MicrosoftDB.connectAndUploadANewBook(dbFile, selected);
+		MicrosoftDB.connectAndDeleteLease(dbFile, selected);
 		MainPane.getScene().getWindow().hide();
 	}
 }

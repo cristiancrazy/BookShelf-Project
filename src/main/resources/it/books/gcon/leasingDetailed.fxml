@@ -7,7 +7,6 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-
 <AnchorPane fx:id="MainPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="285.0" prefWidth="451.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.books.gcon.LeasingDetailedG">
    <children>
       <Label layoutX="163.0" layoutY="14.0" text="Gestione prestiti">
@@ -17,18 +16,18 @@
       </Label>
       <Label layoutX="60.0" layoutY="112.0" text="Nome" />
       <Label layoutX="60.0" layoutY="172.0" text="Cognome" />
-      <TextField fx:id="Surname" layoutX="58.0" layoutY="190.0" />
-      <TextField fx:id="Name" layoutX="58.0" layoutY="130.0" />
       <TextField fx:id="CodeAndTitle" editable="false" layoutX="58.0" layoutY="60.0" prefHeight="26.0" prefWidth="334.0" />
-      <Label layoutX="215.0" layoutY="41.0" text="Codice" />
+      <TextField fx:id="Name" layoutX="58.0" layoutY="130.0" />
+      <TextField fx:id="Surname" layoutX="58.0" layoutY="190.0" />
       <TextField fx:id="TelBox" layoutX="58.0" layoutY="246.0" />
-      <Label layoutX="60.0" layoutY="228.0" text="Recapito telefonico" />
       <DatePicker fx:id="BeginLease" layoutX="216.0" layoutY="130.0" promptText="selezionare la data" />
-      <Label layoutX="218.0" layoutY="112.0" text="Data inzio prestito" />
-      <Label layoutX="218.0" layoutY="172.0" text="Data prevista fine prestito" />
       <DatePicker fx:id="EndLease" layoutX="216.0" layoutY="190.0" promptText="selezionare la data" />
       <Button fx:id="SubmitBtn" layoutX="216.0" layoutY="245.0" mnemonicParsing="false" onAction="#Submit" prefHeight="26.0" prefWidth="84.0" text="Conferma" />
-      <Button fx:id="CloseBtn" layoutX="386.0" layoutY="15.0" mnemonicParsing="false" onAction="#Close" text="Chiudi" />
       <Button fx:id="UnlockBtn" layoutX="309.0" layoutY="245.0" mnemonicParsing="false" onAction="#Unlock" prefHeight="26.0" prefWidth="84.0" text="Sblocca" />
+      <Button fx:id="CloseBtn" layoutX="386.0" layoutY="15.0" mnemonicParsing="false" onAction="#Close" text="Chiudi" />
+      <Label layoutX="215.0" layoutY="41.0" text="Codice" />
+      <Label layoutX="60.0" layoutY="228.0" text="Cell / Email" />
+      <Label layoutX="218.0" layoutY="112.0" text="Data inzio prestito" />
+      <Label layoutX="218.0" layoutY="172.0" text="Data prevista fine prestito" />
    </children>
 </AnchorPane>
