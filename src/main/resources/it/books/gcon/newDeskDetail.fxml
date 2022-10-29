@@ -2,7 +2,6 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToolBar?>
@@ -16,12 +15,11 @@
    <top>
       <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
         <items>
-          <Button mnemonicParsing="false" text="Applica Filtro" />
+          <Button fx:id="FilterBookBtn" mnemonicParsing="false" onAction="#FilterBook" text="Applica Filtro" />
             <TextField fx:id="CodeSearchTextBox" prefHeight="26.0" prefWidth="142.0" promptText="Codice / ISBN" />
             <TextField fx:id="YearSearchTextBox" prefHeight="26.0" prefWidth="58.0" promptText="Anno" />
-            <TextField fx:id="TitleSearchTextBox" prefHeight="26.0" prefWidth="116.0" promptText="Titolo" />
-            <TextField fx:id="AuthorSearchTextBox" prefHeight="26.0" prefWidth="116.0" promptText="Autore" />
-            <ComboBox fx:id="GenreComboBox" prefHeight="26.0" prefWidth="138.0" promptText="Seleziona Genere" />
+            <TextField fx:id="TitleSearchTextBox" prefHeight="26.0" prefWidth="199.0" promptText="Titolo" />
+            <TextField fx:id="AuthorSearchTextBox" prefHeight="26.0" prefWidth="170.0" promptText="Autore" />
         </items>
       </ToolBar>
    </top>

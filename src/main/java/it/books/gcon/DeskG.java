@@ -32,7 +32,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class DeskG {
 
@@ -70,7 +69,7 @@ public class DeskG {
     private void AboutBtn() {
         //Generate a new window from code
         BorderPane pane = new BorderPane();
-        Label label = new Label("Software realizzato per la Biblioteca di Divignano.\nSoftware libero - con licenza MIT\nVersione "+Main.getVersion()+" - 2022\nProgramma realizzato da:\nCristian Capraro");
+        Label label = new Label("Software bibliotecario\nLicenza MIT\nVersione "+Main.getVersion()+" - 2022\nCristian Capraro");
         label.idProperty().setValue("About");
         pane.setCenter(label);
 
@@ -83,7 +82,9 @@ public class DeskG {
         stage.setMinWidth(240);
         stage.setResizable(false);
         stage.setTitle("Informazioni Catalogo");
-        stage.getIcons().add(new Image("https://www.ngmadv.it/wp-content/uploads/2017/06/User-yellow-icon.png"));
+        try {
+            stage.getIcons().add(new Image(this.getClass().getResource("usericon.png").toURI().toURL().openStream()));
+        }catch (Exception ignored){ }
         //Actions (disable multiple instances)
         stage.setOnHiding(i -> AboutButton.setDisable(false));
         stage.setOnShowing(i -> AboutButton.setDisable(true));
@@ -218,7 +219,7 @@ public class DeskG {
             }catch (Exception notFound){
                 //Debug notFound.printStackTrace();
                 //Loading and operating with database files
-                ArrayList<Book> book = new ArrayList<>();
+                ArrayList<Book> book;
                 //Share info
                 OldDeskDetailG.getDBFile(dbFile);
 

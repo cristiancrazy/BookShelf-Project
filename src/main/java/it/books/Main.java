@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.util.Objects;
 
 public class Main extends Application {
-    private final static String version = "1.0.7"; //App version
+    private final static String version = "1.1.0"; //App version
 
     /** Return the current app version. **/
     public static String getVersion(){
@@ -50,7 +50,7 @@ public class Main extends Application {
         });
         stage.setScene(scene);
         stage.setTitle("Catalogo");
-        stage.getIcons().add(new Image("https://aux.iconspalace.com/uploads/book-icon-256-2103632816.png"));
+        stage.getIcons().add(new Image(this.getClass().getResource("bsicon.png").toURI().toURL().openStream()));
         stage.show();
     }
 

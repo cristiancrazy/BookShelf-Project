@@ -13,7 +13,7 @@ package it.books.base;
 public class EvBook {
 	//Lease structure
 	private static class Lease{
-		public Lease(){}; //Init (not in lease)
+		public Lease(){} //Init (not in lease)
 
 		public void setLease(String LeaseBegin, String LeaseExpectedEnd, String Name, String Surname, String Tel){
 			InLeasing = true;
@@ -98,7 +98,7 @@ public class EvBook {
 	private String shelf;
 
 	//Other
-	private String comments;
+	private String comments = "";
 
 	private String ownDate;
 
@@ -125,10 +125,6 @@ public class EvBook {
 		this.comments = comments;
 	}
 
-	public Lease getLease() {
-		return lease;
-	}
-
 	public String getComments() {
 		return comments;
 	}
@@ -151,14 +147,9 @@ public class EvBook {
 		this.ownDate = ownDate;
 	}
 
-
 	@Override
 	public String toString(){
 		return "EvBook ID: " + id + "\nTitle: " + title + "/" + original + "\n";
-	}
-
-	public long getId() {
-		return id;
 	}
 
 	public String getTitle() {

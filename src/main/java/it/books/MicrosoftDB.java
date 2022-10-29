@@ -65,14 +65,6 @@ public class MicrosoftDB {
         }
     }
 
-    /** Connect and retrieve the entire list of books from a given database
-     * @param dbFile specify the database file to work on
-     * @return the list of specified book
-     * **/
-    public static ArrayList<Book> connectAndGet(File dbFile){
-        return connectAndGet(dbFile, 0, 0);
-    }
-
     /** Connect and search on the entire list of books from a given database
      * @param dbFile specify the database file to work on
      * @param author specify the book's author
@@ -178,6 +170,7 @@ public class MicrosoftDB {
             while(res.next()){
                 EvBook book = new EvBook(res.getInt("ID"), res.getString("Codice"), res.getString("Titolo"), res.getString("Autore"));
                 book.addDetails(res.getString("Titolo_Originale"), res.getString("Genere"), res.getString("Anno_Pubblicazione"), res.getString("Edizione"), res.getString("Editore"), res.getString("Collezione"), res.getInt("Pagine"), res.getString("Formato_Pagine"), res.getString("Nazione"), res.getString("Scaffale"), res.getString("Posseduto_Dal"));
+                book.setComments(res.getString("Commento"));
                 try{
                     ResultSet pre = query.executeQuery("SELECT * FROM PRESTITI WHERE Codice=\""+book.getCode()+"\"");
                     if(pre.next()){
@@ -205,12 +198,11 @@ public class MicrosoftDB {
     /** [*** NEW DATABASE] Used to delete an entry in the specified book database.
      * Use at least a param to ensure the book deletion;
      * @param dbFile necessary to work on the specified db
-     * @param id the book id required to remove the book instantly (could be null)
      * @param title the book title required to remove the book instantly (could be null)
      * @param code required to remove the specified book (it could be null)
      * @return true whether the action was correctly applied. False otherwise.
      * **/
-    public static boolean DeleteEntry(File dbFile, int id, String code, String title) {
+    public static boolean DeleteEntry(File dbFile, String code, String title) {
         try(Database db = DatabaseBuilder.open(dbFile)){
             Iterator<Row> rows = db.getTable("LIBRI").iterator();
             Iterator<Row> prestitiRows = db.getTable("PRESTITI").iterator();
@@ -260,7 +252,7 @@ public class MicrosoftDB {
      * **/
     public static int connectAndUploadANewBook(File dbFile, EvBook book){
         try(Database db = DatabaseBuilder.open(dbFile)){
-            db.getTable("LIBRI").addRow(null, book.getCode(), book.getTitle(), book.getAuthors(), book.getGenre(), book.getPublisher(), book.getEdition(), book.getSeries(), book.getOwnDate(), Short.parseShort(Integer.toString(book.getPages())), Short.parseShort(book.getYear()), book.getCountry(), book.getShelf(), null, book.getPagesFormat(), null, book.getOriginal());
+            db.getTable("LIBRI").addRow(null, book.getCode(), book.getTitle(), book.getAuthors(), book.getGenre(), book.getPublisher(), book.getEdition(), book.getSeries(), book.getOwnDate(), Short.parseShort(Integer.toString(book.getPages())), Short.parseShort(book.getYear()), book.getCountry(), book.getShelf(), book.getComments(), book.getPagesFormat(), null, book.getOriginal());
             db.flush();
             if(book.isLeasing()){
                 //Codice, is in leasing, data inzio, data fine, a...
@@ -286,15 +278,64 @@ public class MicrosoftDB {
         try(Connection db = DriverManager.getConnection("jdbc:ucanaccess://"+path+";memory=true")){
             Statement st = db.createStatement();
             ResultSet res = st.executeQuery("SELECT * FROM LIBRI WHERE Codice = '"+code+"'");
-            while (res.next()){
+            if (res.next()){
                 EvBook book = new EvBook(res.getInt("ID"), res.getString("Codice"), res.getString("Titolo"), res.getString("Autore"));
                 book.addDetails(res.getString("Titolo_Originale"), res.getString("Genere"), res.getString("Anno_Pubblicazione"), res.getString("Edizione"), res.getString("Editore"), res.getString("Collezione"), res.getInt("Pagine"), res.getString("Formato_Pagine"), res.getString("Nazione"), res.getString("Scaffale"), res.getString("Posseduto_Dal"));
+                book.setComments(res.getString("Commento"));
                 return book;
             }
         }catch (Exception e){
             return null;
         }
         return null;
+    }
+
+    /** Advanced database search to catch multiple filters (on newest database)
+     * This method use UNION to add results found on multiple queries.
+     * @param dbFile specify the database which work on;
+     * @param code specify the book code;
+     * @param title specify book title;
+     * @param author specify book author;
+     * @param year specify book released year;
+     * @return an arraylist of books found thanks to the specified query.
+     * **/
+    public static ArrayList<EvBook> connectAndSearch(String code, String title, String year, String author, File dbFile){
+        String path = dbFile.getAbsolutePath();
+        path = path.replace("\\", "/"); //Solve a bug
+        try(Connection db = DriverManager.getConnection("jdbc:ucanaccess://"+path+";memory=true")){
+            Statement statement = db.createStatement();
+            StringBuilder SearchQuery = new StringBuilder(); String[] values = new String[4];
+            if((!Objects.equals(code, ""))) values[0] = "SELECT * FROM LIBRI WHERE Codice LIKE '%"+code+"%' ";
+            if(!Objects.equals(title, "")) values[1] = "SELECT * FROM LIBRI WHERE Titolo LIKE '%"+title+"%' ";
+            if(!Objects.equals(year, "")) values[2] = "SELECT * FROM LIBRI WHERE Anno_Pubblicazione LIKE '%"+year+"%' ";
+            if(!Objects.equals(author, "")) values[3] = "SELECT * FROM LIBRI WHERE Autore LIKE '%"+author+"%' ";
+            boolean multiple = false;
+            for(String i : values){
+                if(i == null) continue;
+                SearchQuery.append(multiple? "UNION " : "").append(i);
+                multiple = true;
+            }
+            String SearchFinal;
+
+            //String rewrite - to match query
+            if(SearchQuery.toString().endsWith("UNION ")){
+                SearchFinal = SearchQuery.substring(0, SearchQuery.length()-8);
+            }else SearchFinal = SearchQuery.substring(0, SearchQuery.length()-1);
+
+            System.out.println(SearchFinal);
+
+            ResultSet res = statement.executeQuery(SearchFinal);
+            ArrayList<EvBook> books = new ArrayList<>();
+            while (res.next()){
+                EvBook book = new EvBook(res.getInt("ID"), res.getString("Codice"), res.getString("Titolo"), res.getString("Autore"));
+                book.addDetails(res.getString("Titolo_Originale"), res.getString("Genere"), res.getString("Anno_Pubblicazione"), res.getString("Edizione"), res.getString("Editore"), res.getString("Collezione"), res.getInt("Pagine"), res.getString("Formato_Pagine"), res.getString("Nazione"), res.getString("Scaffale"), res.getString("Posseduto_Dal"));
+                book.setComments(res.getString("Commento"));
+                books.add(book);
+            }
+            return books;
+        }catch (SQLException exc){
+            return null;
+        }
     }
 
     /** Connect to the database and add a new lease entry
@@ -310,9 +351,7 @@ public class MicrosoftDB {
             String[] personData = book.leasedTo().split(";");
             db.getTable("PRESTITI").addRow(book.getCode(), book.isLeasing(), book.getBeginDate(), book.getEndDate(), personData[0]+";"+personData[1]+";"+personData[2]);
             //Reset here
-        }catch (IOException | NoSuchElementException e){
-            return;
-        }
+        }catch (IOException | NoSuchElementException ignored){ }
     }
 
     /** Connect to the database and delete an existing lease information
@@ -333,8 +372,7 @@ public class MicrosoftDB {
                     db.getTable("PRESTITI").deleteRow(row1);
                 }
             }
-        }catch (IOException | NoSuchElementException e){
-            return;
-        }
+        }catch (IOException | NoSuchElementException ignored){ }
     }
+
 }

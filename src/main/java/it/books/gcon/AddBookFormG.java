@@ -49,6 +49,10 @@ public class AddBookFormG {
 	//FXML Components
 	@FXML
 	TextField IDBookData, CodeData, TitleData, AuthorsData, OriginalData, GenreData, YearData, EditionData, EditorData, SeriesData, PagesData, FormatData, CountryData, ShelfData;
+
+	@FXML
+	TextArea CommentBox;
+
 	@FXML
 	DatePicker DatePickerData;
 	@FXML
@@ -59,17 +63,18 @@ public class AddBookFormG {
 	public void AddToDBBtn(){
 		if(TitleData.getText().isEmpty()||CodeData.getText().isEmpty()){
 			new Alert(Alert.AlertType.ERROR, "Per registrare un nuovo libro bisogna inserire almeno il TITOLO e il CODICE (o ISBN)", ButtonType.OK).showAndWait();
-			return;
 		}else{
 			EvBook newBook = new EvBook(Integer.parseInt(IDBookData.getText()), CodeData.getText(), TitleData.getText(), AuthorsData.getText());
 			if(PagesData.getText().isEmpty()) PagesData.setText("0");
 			if(YearData.getText().isEmpty()) YearData.setText("0");
 			try{
 				newBook.addDetails(OriginalData.getText(), GenreData.getText(), YearData.getText(), EditionData.getText(), EditorData.getText() ,SeriesData.getText(), Integer.parseInt(PagesData.getText()), FormatData.getText(), CountryData.getText(), ShelfData.getText(), DatePickerData.getValue().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+				newBook.setComments(CommentBox.getText());
 				int lastID;
 				if((lastID = MicrosoftDB.connectAndUploadANewBook(workingDB, newBook)) != -1){
 					EvBook bookFinalized = new EvBook(lastID, newBook.getCode(), newBook.getTitle(), newBook.getAuthors());
 					bookFinalized.addDetails(newBook.getOriginal(), newBook.getGenre(), newBook.getYear(), newBook.getEdition(), newBook.getPublisher(), newBook.getSeries(), newBook.getPages(), newBook.getPagesFormat(), newBook.getCountry(), newBook.getShelf(), newBook.getOwnDate());
+					bookFinalized.setComments(newBook.getComments());
 					parent.getItems().add(bookFinalized);
 					new Alert(Alert.AlertType.INFORMATION, "Libro aggiunto al database.", ButtonType.OK).showAndWait();
 					MainPane.getScene().getWindow().hide(); //Hide Window

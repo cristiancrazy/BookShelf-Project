@@ -20,7 +20,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
@@ -28,8 +27,8 @@ import javafx.stage.StageStyle;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Objects;
-import java.util.Optional;
 
 public class NewDeskDetailG {
 	//Get DB file path
@@ -45,7 +44,7 @@ public class NewDeskDetailG {
 	//On init
 	@FXML @SuppressWarnings("unchecked")
 	private void initialize(){
-		Task<Void> tableSet = new Task<Void>() {
+		Task<Void> tableSet = new Task<>() {
 			@Override
 			protected Void call() throws Exception {
 				Thread.sleep(512); //Delay
@@ -74,13 +73,11 @@ public class NewDeskDetailG {
 	@FXML
 	BorderPane MainPane;
 	@FXML
-	Button AddBookBtn, RemBookBtn, DetailBtn, LeaseBtn;
+	Button AddBookBtn, RemBookBtn, DetailBtn, LeaseBtn, FilterBookBtn;
 	@FXML
 	TextField TitleTextBox, AuthorsTextBox, GenreTextBox, YearTextBox, EditionTextBox, PageTextBox, CodeTextBox;
 	@FXML
 	TextField TitleSearchTextBox, AuthorSearchTextBox, YearSearchTextBox, CodeSearchTextBox;
-	@FXML
-	ComboBox<String> GenreComboBox;
 
 	//FXML ACTION
 
@@ -93,7 +90,7 @@ public class NewDeskDetailG {
 		alert.showAndWait().ifPresent(btn -> {
 			if(btn.equals(ButtonType.YES)){
 				table.getItems().remove(selected);
-				MicrosoftDB.DeleteEntry(workingDB, -1, selected.getCode(), selected.getTitle());
+				MicrosoftDB.DeleteEntry(workingDB, selected.getCode(), selected.getTitle());
 			}
 		});
 	}
@@ -114,12 +111,10 @@ public class NewDeskDetailG {
 				((TableView<EvBook>) MainPane.getCenter()).getItems().clear();
 				((TableView<EvBook>) MainPane.getCenter()).getItems().addAll(MicrosoftDB.connectAndGetNew(workingDB)); //Reload db
 			});
-			stage.setOnShowing(ref -> {
-				AddBookBtn.setDisable(true);
-			});
+			stage.setOnShowing(ref -> AddBookBtn.setDisable(true));
 		}catch (IOException ignored){
 			AddBookBtn.setDisable(false);
-		};
+		}
 
 	}
 
@@ -132,20 +127,27 @@ public class NewDeskDetailG {
 		BorderPane pane = new BorderPane();
 
 		GridPane detPane = new GridPane();
+		detPane.setVgap(20);
+		detPane.setAlignment(Pos.CENTER);
 		detPane.add(new Label("In possesso dal: "), 0, 0);
-		detPane.add(new Label(selected.getOwnDate()), 1, 0);
+		detPane.add(new Label(selected.getOwnDate() == null? "(indefinito)" : selected.getOwnDate()), 1, 0);
 		detPane.add(new Label("Formato pagine: "), 0, 1);
-		detPane.add(new Label(selected.getPagesFormat()), 1, 1);
+		detPane.add(new Label(selected.getPagesFormat() == null? "(indefinito)" : selected.getPagesFormat()), 1, 1);
 		detPane.add(new Label("Titolo originale: "), 0, 2);
-		detPane.add(new Label(selected.getOriginal()), 1, 2);
+		detPane.add(new Label(selected.getOriginal() == null? "(indefinito)" : selected.getOriginal()), 1, 2);
 		detPane.add(new Label("Nazione: "), 0, 3);
-		detPane.add(new Label(selected.getCountry()), 1, 3);
+		detPane.add(new Label(selected.getCountry() == null? "(indefinito)" : selected.getCountry()), 1, 3);
 		detPane.add(new Label("Collana: "), 0, 4);
-		detPane.add(new Label(selected.getSeries()), 1, 4);
+		detPane.add(new Label(selected.getSeries() == null? "(indefinito)" : selected.getSeries()), 1, 4);
 		detPane.add(new Label("Scaffale: "), 0, 5);
-		detPane.add(new Label(selected.getShelf()), 1, 5);
-		detPane.setAlignment(Pos.TOP_CENTER);
-		detPane.setPadding(new Insets(0, 25, 0, 25));
+		detPane.add(new Label(selected.getShelf() == null? "(indefinito)" : selected.getShelf()), 1, 5);
+		detPane.add(new Label("Commento: "), 0, 6);
+		try{
+			detPane.add(new Label(selected.getComments().isEmpty()? "(indefinito)" : selected.getComments()), 1, 6);
+		}catch (NullPointerException npe){
+			detPane.add(new Label("(indefinito)"), 1, 6);
+		}
+		detPane.setPadding(new Insets(10, 25, 10, 25));
 		int n = 0;
 		for(Node i : detPane.getChildren()){
 			if(i.getClass() == Label.class){
@@ -160,7 +162,7 @@ public class NewDeskDetailG {
 			}
 		}
 		pane.setCenter(detPane);
-		Scene scene = new Scene(pane, 300, 150);
+		Scene scene = new Scene(pane, 640, 480);
 		Stage stage = new Stage();
 		stage.setOnShown(i -> DetailBtn.setDisable(true));
 		stage.setOnHidden(i -> DetailBtn.setDisable(false));
@@ -171,6 +173,37 @@ public class NewDeskDetailG {
 		stage.setScene(scene);
 		stage.show();
 	}
+
+
+	//Flag
+	private static boolean alreadyFiltered = false;
+	@FXML @SuppressWarnings("unchecked")
+	public void FilterBook(){
+		TableView<EvBook> table = (TableView<EvBook>) MainPane.getCenter();
+		table.getItems().clear();
+		if(!alreadyFiltered){
+			ArrayList<EvBook> books = MicrosoftDB.connectAndSearch(CodeSearchTextBox.getText(), TitleSearchTextBox.getText(), YearSearchTextBox.getText(), AuthorSearchTextBox.getText(), workingDB);
+			if(!Objects.isNull(books)) {
+				table.getItems().addAll(books);
+			}
+			alreadyFiltered = true; //Set flag and lock interface
+			FilterBookBtn.setText("Reset");
+			CodeSearchTextBox.setDisable(true);
+			TitleSearchTextBox.setDisable(true);
+			AuthorSearchTextBox.setDisable(true);
+			YearSearchTextBox.setDisable(true);
+		}else{
+			alreadyFiltered = false; //Reset flag and unlock interface
+			FilterBookBtn.setText("Applica Filtro");
+			CodeSearchTextBox.setDisable(false);
+			TitleSearchTextBox.setDisable(false);
+			AuthorSearchTextBox.setDisable(false);
+			YearSearchTextBox.setDisable(false);
+			((TableView<EvBook>) MainPane.getCenter()).getItems().addAll(MicrosoftDB.connectAndGetNew(workingDB)); //Reload db
+		}
+
+	}
+
 
 	@SuppressWarnings("unchecked")
 	public void LeaseButton(){
