@@ -255,7 +255,7 @@ public class MicrosoftDB {
             db.getTable("LIBRI").addRow(null, book.getCode(), book.getTitle(), book.getAuthors(), book.getGenre(), book.getPublisher(), book.getEdition(), book.getSeries(), book.getOwnDate(), Short.parseShort(Integer.toString(book.getPages())), Short.parseShort(book.getYear()), book.getCountry(), book.getShelf(), book.getComments(), book.getPagesFormat(), null, book.getOriginal());
             db.flush();
             if(book.isLeasing()){
-                //Codice, is in leasing, data inzio, data fine, a...
+                //Codice, is in leasing, data inizio, data fine, a...
                 String[] personData = book.leasedTo().split(";");
                 db.getTable("PRESTITI").addRow(book.getCode(), book.isLeasing(), book.getBeginDate(), book.getEndDate(), personData[0]+";"+personData[1]+";"+personData[2]);
                 db.flush();
@@ -330,6 +330,15 @@ public class MicrosoftDB {
                 EvBook book = new EvBook(res.getInt("ID"), res.getString("Codice"), res.getString("Titolo"), res.getString("Autore"));
                 book.addDetails(res.getString("Titolo_Originale"), res.getString("Genere"), res.getString("Anno_Pubblicazione"), res.getString("Edizione"), res.getString("Editore"), res.getString("Collezione"), res.getInt("Pagine"), res.getString("Formato_Pagine"), res.getString("Nazione"), res.getString("Scaffale"), res.getString("Posseduto_Dal"));
                 book.setComments(res.getString("Commento"));
+
+                //Add leasing details
+                try(Connection db2 = DriverManager.getConnection("jdbc:ucanaccess://"+path+";memory=true")){
+                    ResultSet pre = db2.createStatement().executeQuery("SELECT * FROM PRESTITI WHERE Codice=\""+book.getCode()+"\"");
+                    if(pre.next()){
+                        book.setLease(pre.getString("Data_Inizio_Prestito"), pre.getString("Data_Fine_Prestito"), pre.getString("Prestato_A").split(";")[0], pre.getString("Prestato_A").split(";")[1], pre.getString("Prestato_A").split(";")[2]);
+                    }
+                }catch (Exception ignored){ }
+
                 books.add(book);
             }
             return books;

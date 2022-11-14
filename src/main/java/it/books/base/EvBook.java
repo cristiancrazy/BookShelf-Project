@@ -216,6 +216,18 @@ public class EvBook {
 		return lease.getLeaseExpectedEnd();
 	}
 
+	//THIS MUSTN'T BE REMOVED (TABLE USE IT INDIRECTLY)
+	@SuppressWarnings("unused")
+	public long getId() {
+		return id;
+	}
+
+	//THIS MUSTN'T BE REMOVED (TABLE USE IT INDIRECTLY)
+	@SuppressWarnings("unused")
+	public Lease getLease() {
+		return lease;
+	}
+
 	public String leasedTo(){
 		if(!isLeasing()) return null;
 		return lease.getName() + ";" + lease.getSurname() + ";" + lease.getTel();

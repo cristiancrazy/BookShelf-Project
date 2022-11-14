@@ -180,18 +180,25 @@ public class NewDeskDetailG {
 	@FXML @SuppressWarnings("unchecked")
 	public void FilterBook(){
 		TableView<EvBook> table = (TableView<EvBook>) MainPane.getCenter();
-		table.getItems().clear();
 		if(!alreadyFiltered){
-			ArrayList<EvBook> books = MicrosoftDB.connectAndSearch(CodeSearchTextBox.getText(), TitleSearchTextBox.getText(), YearSearchTextBox.getText(), AuthorSearchTextBox.getText(), workingDB);
-			if(!Objects.isNull(books)) {
-				table.getItems().addAll(books);
+			try{
+				ArrayList<EvBook> books = MicrosoftDB.connectAndSearch(CodeSearchTextBox.getText(), TitleSearchTextBox.getText(), YearSearchTextBox.getText(), AuthorSearchTextBox.getText(), workingDB);
+				if(books != null) { //Prevent throwing unuseful exception
+					if(!books.isEmpty()){
+						table.getItems().clear(); //Clear the table
+						alreadyFiltered = true; //Set flag and lock interface
+						FilterBookBtn.setText("Reset");
+						CodeSearchTextBox.setDisable(true);
+						TitleSearchTextBox.setDisable(true);
+						AuthorSearchTextBox.setDisable(true);
+						YearSearchTextBox.setDisable(true);
+						table.getItems().addAll(books);
+					}else new Alert(Alert.AlertType.ERROR, "La ricerca non ha prodotto risultati validi.", ButtonType.CLOSE).showAndWait();
+				}
+			}catch (Exception ignored){
+				new Alert(Alert.AlertType.ERROR, "Parametri di ricerca non corretti", ButtonType.CLOSE).showAndWait();
 			}
-			alreadyFiltered = true; //Set flag and lock interface
-			FilterBookBtn.setText("Reset");
-			CodeSearchTextBox.setDisable(true);
-			TitleSearchTextBox.setDisable(true);
-			AuthorSearchTextBox.setDisable(true);
-			YearSearchTextBox.setDisable(true);
+
 		}else{
 			alreadyFiltered = false; //Reset flag and unlock interface
 			FilterBookBtn.setText("Applica Filtro");
@@ -203,7 +210,6 @@ public class NewDeskDetailG {
 		}
 
 	}
-
 
 	@SuppressWarnings("unchecked")
 	public void LeaseButton(){
